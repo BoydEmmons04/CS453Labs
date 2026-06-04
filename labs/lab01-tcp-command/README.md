@@ -1,6 +1,6 @@
 # Lab 1 - TCP Command Server
 
-In this lab, you will extend a simple TCP echo server into a small command-based TCP server.
+In this lab, I extended a simple TCP echo server into a small command-based TCP server.
 
 The lecture example showed a basic client/server program where the client sends text and the server echoes the same text back. This lab builds on that idea by adding a simple command protocol.
 
@@ -162,25 +162,29 @@ You may also run the tests in watch mode if supported by the starter project:
 npm run test:watch
 ```
 
-## Suggested Workflow
+## Workflow
 
 1. Run the server and client before changing anything.
-2. Try the existing commands manually.
-3. Run the automated tests.
-4. Open `src/commands.js`.
-5. Implement one command at a time.
-6. Run `npm test` after each change.
-7. Once the tests pass, test manually with the client.
-8. Update this README to describe the final protocol.
+2. Open `src/commands.js`.
+3. Implement one command at a time.
+4. Run `npm test` after each change.
+5. Once the tests pass, test manually with the client.
+6. Fix bug in client.js that occurred when the quit command would cause crash (line 23)
+7. Updated this README to describe the final protocol.
+8. Final tests before submission
 
 ## Reflection Questions
 
 Answer the following questions in your submission:
 
 1. What is the difference between the client and the server?
+    * A server is a listener that offers services through requests. A client requests those services from the server
 2. Why does the server need to keep running after handling one request?
+    * So it can catch other requests because servers usually do not only take one request and then shut down
 3. What happens if two clients connect at the same time?
+    * Each client gets its own socket and the server handles the multiple connections fine
 4. How is this different from HTTP?
+    * HTTP contains more information such as headers and metadata. HTTP also usually closes the connection after each request.
 
 ## Submission
 

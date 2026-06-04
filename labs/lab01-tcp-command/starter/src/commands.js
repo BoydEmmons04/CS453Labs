@@ -8,25 +8,22 @@ export function handleCommand(line) {
     const [command, ...parts] = trimmed.split(" ");
     const argument = parts.join(" ");
 
+    // Command list for ECHO, UPPER, LOWER, and QUIT. (TIME and REVERSE implemented for fun but not required)
     switch (command.toUpperCase()) {
         case "ECHO":
             return argument;
 
-        // TODO: implement UPPER
-        // Example:
-        // UPPER hello -> HELLO
+        case "UPPER":
+            return argument.toUpperCase();
 
-        // TODO: implement LOWER
-        // Example:
-        // LOWER HELLO -> hello
+        case "LOWER":
+            return argument.toLowerCase();
+        
+        case "REVERSE":
+            return argument.split("").reverse().join("");
 
-        // TODO: implement REVERSE
-        // Example:
-        // REVERSE hello -> olleh
-
-        // TODO: implement TIME
-        // Example:
-        // TIME -> current server time
+        case "TIME":
+            return new Date().toString();
 
         case "QUIT":
             return "Goodbye.";
