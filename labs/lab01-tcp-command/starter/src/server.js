@@ -2,7 +2,7 @@ import net from "node:net";
 import { handleCommand, shouldCloseConnection } from "./commands.js";
 
 const HOST = process.env.HOST ?? "127.0.0.1";
-const PORT = Number(process.env.PORT ?? 3000);
+const PORT = Number(process.env.PORT ?? 4000);
 
 const server = net.createServer((socket) => {
   const clientAddress = `${socket.remoteAddress}:${socket.remotePort}`;
