@@ -1,0 +1,15 @@
+{
+  "name": "lab02-http-json",
+  "version": "1.0.0",
+  "description": "Lab 2 HTTP JSON service",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "server": "node src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
+  }
+}

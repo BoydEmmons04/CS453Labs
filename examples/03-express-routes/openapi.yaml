@@ -1,0 +1,200 @@
+openapi: 3.0.3
+
+info:
+  title: Example 03 - Express Routes API
+  version: 1.0.0
+  description: >
+    A small HTTP JSON API used to demonstrate Express routes,
+    JSON request bodies, path parameters, status codes, and simple responses.
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns a simple status response to show that the server is running.
+      responses:
+        "200":
+          description: Server is running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+
+  /hello:
+    get:
+      summary: Hello message
+      description: Returns a simple greeting message from the server.
+      responses:
+        "200":
+          description: Greeting response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelloResponse"
+              example:
+                message: Hello from Express
+
+  /requests:
+    get:
+      summary: Request count
+      description: Returns the number of requests handled since the server started.
+      responses:
+        "200":
+          description: Request count response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestCountResponse"
+              example:
+                count: 3
+
+  /echo:
+    post:
+      summary: Echo JSON body
+      description: Accepts a JSON request body and returns it inside a response object.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+            example:
+              message: hello
+      responses:
+        "200":
+          description: Echo response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EchoResponse"
+              example:
+                youSent:
+                  message: hello
+        "400":
+          description: Invalid JSON or bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: Invalid JSON
+
+  /items:
+    get:
+      summary: List items
+      description: Returns a small list of example items.
+      responses:
+        "200":
+          description: Item list response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ItemListResponse"
+              example:
+                items:
+                  - id: 1
+                    name: keyboard
+                  - id: 2
+                    name: mouse
+                  - id: 3
+                    name: monitor
+
+  /items/{id}:
+    get:
+      summary: Get item by ID
+      description: Returns one example item using the ID from the path.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The item ID from the URL path.
+          schema:
+            type: integer
+            example: 7
+      responses:
+        "200":
+          description: Single item response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Item"
+              example:
+                id: 7
+                name: Item 7
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+      required:
+        - status
+
+    HelloResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Hello from Express
+      required:
+        - message
+
+    RequestCountResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 3
+      required:
+        - count
+
+    EchoResponse:
+      type: object
+      properties:
+        youSent:
+          type: object
+          additionalProperties: true
+      required:
+        - youSent
+
+    Item:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: keyboard
+      required:
+        - id
+        - name
+
+    ItemListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Item"
+      required:
+        - items
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not found
+      required:
+        - error

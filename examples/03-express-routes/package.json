@@ -1,0 +1,14 @@
+{
+  "name": "example-03-express-routes",
+  "version": "1.0.0",
+  "description": "Simple Express routes example for CS453",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "server": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "example-02-http-json",
+  "version": "1.0.0",
+  "description": "Simple HTTP and JSON example for CS453",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "server": "node src/server.js",
+    "start": "node src/server.js"
+  }
+}
