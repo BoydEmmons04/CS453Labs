@@ -4,6 +4,7 @@ const DEFAULT_PORT = 3000;
 
 let requestCount = 0;
 
+// Helper function that sends a JSON with the given status code
 export function sendJson(res, statusCode, body) {
     res.writeHead(statusCode, {
         "Content-Type": "application/json"
@@ -12,6 +13,7 @@ export function sendJson(res, statusCode, body) {
     res.end(JSON.stringify(body));
 }
 
+// Helper function that reads the JSON and returns a promise for a parsed object
 export function readJsonBody(req) {
     return new Promise((resolve, reject) => {
         let body = "";
@@ -38,20 +40,63 @@ export function readJsonBody(req) {
 }
 
 export function handleCalculate(body) {
-    // TODO: Validate that operation, a, and b are present.
-    // TODO: Validate that a and b are numbers.
-    // TODO: Support add, subtract, multiply, and divide.
-    // TODO: Return an error for unsupported operations.
-    // TODO: Return an error for division by zero.
+    // Get the operation and operands from the request
+    const { operation, a, b } = body;
 
-    return {
-        statusCode: 501,
-        response: {
-            error: "Calculation not implemented yet"
+    // Validate the input and return 400 if invalid
+    if (operation === undefined || a === undefined || b === undefined) {
+        return {
+            statusCode: 400,
+            response: { error: "Missing required fields: operation, a, b" }
+        };
+    }
+
+    // Validat that a and b are numbers
+    if (typeof a !== "number" || typeof b !== "number" || !Number.isFinite(a) || !Number.isFinite(b)) {
+        return {
+            statusCode: 400,
+            response: { error: "Fields a and b must be finite numbers" }
+        };
+    }
+
+    // Perforn requested operation and check for invalid operations and div by 0
+    if (operation === "add") {
+        return {
+            statusCode: 200,
+            response: { result: a + b }
+        };
+    } else if (operation === "subtract") {
+        return {
+            statusCode: 200,
+            response: { result: a - b }
+        };
+    } else if (operation === "multiply") {
+        return {
+            statusCode: 200,
+            response: { result: a * b }
+        };
+    } else if (operation === "divide") {
+        if (b === 0) {
+            return {
+                statusCode: 400,
+                response: { error: "Division by zero is not allowed" }
+            }
         }
-    };
+        else {
+            return {
+                statusCode: 200,
+                response: { result: a / b }
+            }
+        }
+    } else {
+        return {
+            statusCode: 400,
+            response: { error: `Unsupported operation: ${operation}` }
+        }
+    }
 }
 
+// Helper function that handles incoming request by method and url
 export async function requestHandler(req, res) {
     requestCount += 1;
 
@@ -64,8 +109,8 @@ export async function requestHandler(req, res) {
     }
 
     if (method === "GET" && url === "/requests") {
-        // TODO: Return the current request count as JSON.
-        sendJson(res, 501, { error: "Request counter not implemented yet" });
+        // Return the total number of requests with code 200
+        sendJson(res, 200, { count: requestCount });
         return;
     }
 
@@ -73,8 +118,8 @@ export async function requestHandler(req, res) {
         try {
             const body = await readJsonBody(req);
 
-            // TODO: Return the parsed JSON body back to the client.
-            sendJson(res, 501, { error: "Echo not implemented yet" });
+            // calls the sendJson function with the body
+            sendJson(res, 200, body);
         } catch {
             sendJson(res, 400, { error: "Invalid JSON" });
         }
