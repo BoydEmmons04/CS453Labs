@@ -34,11 +34,11 @@ npm test
 
 ### 1. What makes this API more REST-like than the previous HTTP/JSON lab?
 
-TODO
+
 
 ### 2. What is the purpose of a route parameter such as `/items/:id`?
 
-TODO
+It allows you to specify an id with each query
 
 ### 3. Why should `POST`, `PUT`, and `DELETE` use different HTTP methods?
 
