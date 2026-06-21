@@ -17,29 +17,72 @@ export function createApp() {
     res.json({ status: "ok" });
   });
 
-  // TODO: Return all items.
+  // Returns the items array entirely
   app.get("/items", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    res.json(items)
   });
 
-  // TODO: Return one item by ID.
+  // Returns the item specified by the id
   app.get("/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    const id = Number(req.params.id);
+    const item = items.find((item) => item.id === id);
+
+    if(!item) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    res.json(item);
   });
 
-  // TODO: Create a new item.
+  // Adds a new item to the array
   app.post("/items", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    const { name, body } = req.body;
+
+    if (!name || quantity === undefined) {
+      return res.status(400).json({ error: "name and quantity required" });
+    }
+
+    const item = {
+      id: nextId++,
+      name,
+      quantity
+    };
+
+    items.push(item);
+    res.status(201).json(item);
   });
 
-  // TODO: Update an existing item.
+  // Takes in an id and an item and replaces the id with the item
   app.put("/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    const id = Number(req.params.id);
+    const { name, quantity } = req.body;
+    const index = items.findIndex((item) => item.id === id);
+
+    if (!name || quantity === undefined) {
+      return res.status(400).json({ error: "name and quantity required"});
+    }
+
+    if (index === -1) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    const updatedItem = { id, name, quantity };
+    items[index] = updatedItem;
+
+    res.json(updatedItem);
   });
 
-  // TODO: Delete an existing item.
+  // Remove an item using splice
   app.delete("/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    const id = Number(req.params.id);
+    const index = items.findIndex((item) => item.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    items.splice(index, 1);
+    res.status(204).send();
   });
 
   app.use((req, res) => {
