@@ -60,6 +60,10 @@ Client: http://localhost:5173
 That makes this a cross-origin browser request. The API server uses CORS so the
 browser is allowed to read the response.
 
+Use either http://localhost:5173 or http://127.0.0.1:5173 consistently.
+
+For CORS, localhost and 127.0.0.1 are not the same origin.
+
 ## Main lesson
 
 A browser client is not just curl with buttons. The browser enforces security
