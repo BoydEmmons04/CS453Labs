@@ -36,9 +36,9 @@ export function createApp() {
 
   // Adds a new item to the array
   app.post("/items", (req, res) => {
-    const { name, body } = req.body;
+    const { name, quantity } = req.body;
 
-    if (!name || quantity === undefined) {
+    if (typeof name !== "string" || name.trim() === "" || typeof quantity !== "number") {
       return res.status(400).json({ error: "name and quantity required" });
     }
 
@@ -58,7 +58,7 @@ export function createApp() {
     const { name, quantity } = req.body;
     const index = items.findIndex((item) => item.id === id);
 
-    if (!name || quantity === undefined) {
+    if (typeof name !== "string" || name.trim() === "" || typeof quantity !== "number") {
       return res.status(400).json({ error: "name and quantity required"});
     }
 
