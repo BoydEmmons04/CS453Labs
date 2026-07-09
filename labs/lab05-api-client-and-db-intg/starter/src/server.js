@@ -90,9 +90,42 @@ export function createApp() {
     }
   });
 
-  // TODO: Return one item by ID.
-  app.get("/api/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+  // Return one item by ID.
+  app.get("/api/items/:id", async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "A valid item ID is required."
+      });
+    }
+
+    try {
+      const result = await pool.query(
+        `
+          SELECT id, name, quantity
+          FROM items
+          WHERE id = $1
+        `,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: "Not Found",
+          message: `Item ${id} not found.`
+        });
+      }
+
+      res.json({ item: result.rows[0] });
+    } catch (error) {
+      console.error("Failed to load item:", error);
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: "Failed to load item."
+      });
+    }
   });
 
   // TODO: Replace one item by ID.
