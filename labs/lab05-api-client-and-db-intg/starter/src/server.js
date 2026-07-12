@@ -94,6 +94,7 @@ export function createApp() {
   app.get("/api/items/:id", async (req, res) => {
     const id = Number(req.params.id);
 
+    // Error check for invalid ID
     if (!Number.isInteger(id) || id <= 0) {
       return res.status(400).json({
         error: "Bad Request",
@@ -101,6 +102,7 @@ export function createApp() {
       });
     }
 
+    // try catch for the database query
     try {
       const result = await pool.query(
         `
@@ -111,6 +113,7 @@ export function createApp() {
         [id]
       );
 
+      // if the item doesnt exist return 404
       if (result.rows.length === 0) {
         return res.status(404).json({
           error: "Not Found",
@@ -120,6 +123,7 @@ export function createApp() {
 
       res.json({ item: result.rows[0] });
     } catch (error) {
+      // catch if the database query fails 
       console.error("Failed to load item:", error);
       res.status(500).json({
         error: "Internal Server Error",
@@ -128,28 +132,204 @@ export function createApp() {
     }
   });
 
-  // TODO: Replace one item by ID.
-  app.put("/api/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+  // Replace one item by ID
+  app.put("/api/items/:id", async (req, res) => {
+    const id = Number(req.params.id);
+
+    // check if id is a valid number else return 400
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "A valid item ID is required."
+      });
+    }
+
+    const name = req.body?.name?.trim();
+    const quantity = Number(req.body?.quantity);
+
+    // error check name and quantity
+    if (!name || !Number.isInteger(quantity) || quantity < 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "A name and non-negative integer quantity are required."
+      });
+    }
+
+    // try catch for database query
+    try {
+      const result = await pool.query(
+        `
+          UPDATE items
+          SET name = $1, quantity = $2
+          WHERE id = $3
+          RETURNING id, name, quantity
+        `,
+        [name, quantity, id]
+      );
+
+      // if the item is not found return 404
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: "Not Found",
+          message: `Item ${id} not found.`
+        });
+      }
+
+      res.json({ item: result.rows[0] });
+    } catch (error) {
+      // catch if database query fails and return 500
+      console.error("Failed to update item:", error);
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: "Failed to update item."
+      });
+    }
   });
 
-  // TODO: Partially update one item by ID.
-  app.patch("/api/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+  // Partially update one item by ID.
+  app.patch("/api/items/:id", async (req, res) => {
+    const id = Number(req.params.id);
+
+    // error check for invalid ID
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "A valid item ID is required."
+      });
+    }
+
+    // initialize update object to hold the new field
+    const updates = {};
+
+    // check if the name is provided
+    if (req.body?.name !== undefined) {
+      const name = req.body.name?.trim();
+
+      // if name is empty return 400
+      if (!name) {
+        return res.status(400).json({
+          error: "Bad Request",
+          message: "Name must be a non-empty string."
+        });
+      }
+
+      // set the name in the updates object
+      updates.name = name;
+    }
+
+    // check if the quantity is provided
+    if (req.body?.quantity !== undefined) {
+      const quantity = Number(req.body.quantity);
+
+      // if the quantity is invalid return 400
+      if (!Number.isInteger(quantity) || quantity < 0) {
+        return res.status(400).json({
+          error: "Bad Request",
+          message: "Quantity must be a non-negative integer."
+        });
+      }
+
+      // set the quantity in the updates object
+      updates.quantity = quantity;
+    }
+
+    // if not fields are given return 400
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "At least one field to update is required."
+      });
+    }
+
+    // try catch for the database query
+    try {
+      const fields = Object.keys(updates);
+      const values = Object.values(updates);
+      const setClauses = fields.map((field, index) => `${field} = $${index + 2}`).join(", ");
+
+      // execute the update query 
+      const result = await pool.query(
+        `
+          UPDATE items
+          SET ${setClauses}
+          WHERE id = $1
+          RETURNING id, name, quantity
+        `,
+        [id, ...values]
+      );
+
+      // if the item is not found return 404
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: "Not Found",
+          message: `Item ${id} not found.`
+        });
+      }
+
+      res.json({ item: result.rows[0] });
+    } catch (error) {
+      // catch if the query fails
+      console.error("Failed to update item:", error);
+      res.status(500).json({
+        error: "Internal Server Error",
+        message: "Failed to update item."
+      });
+    }
   });
 
-  // TODO: Delete one item by ID.
+  // delete database item by id
   app.delete("/api/items/:id", (req, res) => {
-    res.status(501).json({ error: "Not implemented yet" });
+    const id = Number(req.params.id);
+
+    // error check for invalid ID
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).json({
+        error: "Bad Request",
+        message: "A valid item ID is required."
+      });
+    }
+
+    // execute the dataase query
+    pool.query(
+      `
+        DELETE FROM items
+        WHERE id = $1
+        RETURNING id
+      `,
+      [id]
+    )
+      .then((result) => {
+        // if the item is not found return 404
+        if (result.rows.length === 0) {
+          return res.status(404).json({
+            error: "Not Found",
+            message: `Item ${id} not found.`
+          });
+        }
+
+        // if success, 204
+        res.status(204).send();
+      })
+      .catch((error) => {
+        // catch query fail and return 500
+        console.error("Failed to delete item:", error);
+        res.status(500).json({
+          error: "Internal Server Error",
+          message: "Failed to delete item."
+        });
+      });
   });
 
+  // catch all 404 route
   app.use((req, res) => {
     res.status(404).json({ error: "Not found" });
   });
 
+  // return the app instance
   return app;
 }
 
+// initialize the database
 export async function initializeDatabase() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS items (

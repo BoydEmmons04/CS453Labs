@@ -11,15 +11,17 @@
       <section class="panel">
         <h1>Lab 5 Inventory Client</h1>
         <p>
-          This starter client can load items and create a new item. Extend it
-          as you add more API routes.
+          Load items from the API, inspect a selected record, and update or delete it.
         </p>
 
+        <!-- Action buttons for reloading data and clearing the current selection -->
         <div class="actions">
           <button id="load-items" type="button">Load Items</button>
+          <button id="clear-selection" type="button" class="secondary">Clear Selection</button>
         </div>
 
-        <form id="add-item-form">
+        <!-- Form for creating a new item -->
+        <form id="add-item-form" class="stacked-form">
           <label>
             Name
             <input id="item-name" name="name" type="text" required>
@@ -33,9 +35,38 @@
           <button type="submit">Add Item</button>
         </form>
 
-        <p id="status" class="status">Ready.</p>
+        <!-- Inventory section that shows the list of items and the latest status message -->
+        <section class="section-card">
+          <h2>Inventory</h2>
+          <p id="status" class="status" role="status">Ready.</p>
+          <div id="items" class="items"></div>
+        </section>
 
-        <ul id="items" class="items"></ul>
+        <!-- Detail section for viewing and editing the currently selected item -->
+        <section class="section-card detail-card">
+          <h2>Selected Item</h2>
+          <div id="selected-item" class="selected-item">No item selected.</div>
+
+          <!-- Form for updating the selected item's name and quantity -->
+          <form id="edit-item-form" class="stacked-form">
+            <input id="edit-id" name="id" type="hidden">
+
+            <label>
+              Name
+              <input id="edit-name" name="name" type="text" required>
+            </label>
+
+            <label>
+              Quantity
+              <input id="edit-quantity" name="quantity" type="number" min="0" required>
+            </label>
+
+            <div class="button-row">
+              <button type="submit">Save Changes</button>
+              <button id="delete-item" type="button" class="danger">Delete Item</button>
+            </div>
+          </form>
+        </section>
       </section>
     </main>
 
